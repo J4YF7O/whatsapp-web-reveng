@@ -1,0 +1,80 @@
+@import "node_modules/bootstrap/scss/bootstrap";
+@import "loader";
+
+body {
+  background-color: $gray-400;
+  font-family: Segoe UI,Helvetica Neue,Helvetica,Lucida Grande,Arial,Ubuntu,Cantarell,Fira Sans,sans-serif;
+}
+.bg-body {
+  background-color: $gray-400;
+}
+.main {
+  margin-left: auto;
+  margin-right: auto;
+
+  > .content {
+    height: 100%;
+  }
+}
+
+
+#app {
+  min-width: 100vw;
+}
+
+#view-0 {
+  min-width: 100vw;
+  min-height: 100vh;
+  .list-group-item {
+    display: list-item;
+    margin-left: 20px;
+  }
+}
+@for $i from 1 through 2 {
+  #view-#{$i} {
+    &:before {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: 100%;
+      z-index: -1;
+      background-color: $info;
+    }
+    > .main > .content {
+      box-sizing: border-box;
+      min-width: 600px;
+    }
+  }
+}
+
+@media screen and (min-width:992px) {
+  #view-2 {
+      &:before {
+        height: 127px;
+      }
+      > .main {
+        max-height: calc(100vh - 2rem);
+        max-width: 1396px;
+      }
+  }
+}
+#view-2 {
+  .wwr-chat-title {
+
+  }
+  .wwr-chat-last-message {
+
+  }
+}
+@media screen and (min-width:660px) {
+  #view-1 {
+    &:before {
+      height: 222px;
+    }
+    > .main {
+      //                        Logo  margtop margbtm
+      max-height: calc(100vh - (64px + 16px + 16px));
+      max-width: 1050px;
+    }
+  }
+}
