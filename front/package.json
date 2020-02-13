@@ -8,10 +8,12 @@
   },
   "dependencies": {
     "bootstrap": "^4.4.1",
+    "config.ts": "^1.0.0",
     "jquery": "^3.4.1",
     "json-formatter-js": "^2.3.3",
     "popper.js": "^1.16.1",
-    "scss": "^0.2.4"
+    "scss": "^0.2.4",
+    "src": "^1.1.2"
   },
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^5.12.1",
