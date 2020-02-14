@@ -11,6 +11,9 @@ export default class WAChat {
     get jid(): string {
         return this._jid.split("@")[0];
     }
+    get jid_full(): string {
+        return this._jid;
+    }
     get name(): string {
         // TODO reformatad jid and print phone number instead.
         return (this._name)? this._name: this._jid

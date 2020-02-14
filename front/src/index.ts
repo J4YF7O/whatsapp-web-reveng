@@ -10,7 +10,7 @@ import WebSocketMessageListener from "./helpers/WebSocketMessageListener";
 import ListView from "./helpers/ListView";
 import WAChat from "./model/WAChat";
 import WAChatMessage from "./model/WAChatMessage";
-import {showMessages, showLoading, showQRCode, updateQRCode} from "./view";
+import {showMessages, showLoading, showQRCode, updateQRCode, elements, show, hide} from "./view";
 
 let clientWebsocket = new WebSocketClientHelper(config.API_URL);
 let isClientLoggedIn: boolean;
@@ -18,14 +18,17 @@ let chatRequestResult: any = null;
 
 let currentChatMessages: ListView<WAChatMessage> = new ListView<WAChatMessage>((message: WAChatMessage) => {
     let li = document.createElement("li");
+    console.log("Look at my render :)");
     li.className = "list-group-item";
     li.innerHTML = `
         <div class="row">
-            ${message.content}
+            <div class="row">
+                ${message.content}
+            </div>
         </div>
         `;
     return li;
-}, document.querySelector("#wwr-chat-content-list"));
+}, document.querySelector("#wwr-chat-content-ul"));
 
 
 let chats: ListView<WAChat> = new ListView<any>((chat: WAChat) => {
@@ -45,7 +48,7 @@ let chats: ListView<WAChat> = new ListView<any>((chat: WAChat) => {
             </div>
         </div>`;
     li.addEventListener("click", (event: MouseEvent) => {
-        console.log("Downloading...");
+        getChatHistory(chat.jid_full)
     });
     return li;
 }, document.querySelector("#wwr-chat-ul"));
@@ -218,3 +221,39 @@ connectWhatsAppStep.nextStep = new WebsocketStepWait(
         })
 );
 stepLoginAPI.run();
+
+function getChatHistory(jid: string) {
+     new WebsocketStepWait(
+        clientWebsocket,
+        (webSocket) => {
+            show(elements.messagesLoader);
+            hide(elements.messageChatContentList);
+            webSocket.call({
+                command : "backend-getChatHistory",
+                jid: jid,
+                from: "client"
+            });
+        }, new WebSocketMessageListener(
+            (obj, tag) =>
+                "type"     in obj && obj.type === "chat_history"    &&
+                "jid"      in obj && obj.jid === jid                &&
+                "messages" in obj && Array.isArray(obj.messages)
+          , (obj, tag) => {
+                return new Promise<any>((resolve, reject) => {
+                    hide(elements.messagesLoader);
+                    let element = obj.messages.sort(
+                        (m, m1) => m.messageTimestamp - m1.messageTimestamp
+                    );
+                    element.forEach((m: any) => {
+                        currentChatMessages.add(WAChatMessage.createFromJSON(m));
+                    });
+                    resolve(obj);
+                    show(elements.messageChatContentList);
+                    elements.messageChatContent.scrollTo(0, elements.messageChatContent.scrollHeight);
+
+                    currentChatMessages.download("chat-" + obj.jid + ".json");
+                })
+            }
+        )
+    ).run()
+}

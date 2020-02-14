@@ -55,6 +55,17 @@ body {
       > .main {
         max-height: calc(100vh - 2rem);
         max-width: 1396px;
+        overflow: hidden;
+      }
+      #wwr-chat-ul {
+        max-height: calc(100vh - 2rem - 122px);
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+      #wwr-chat-content {
+        max-height: calc(100vh - 2rem);
+        overflow-x: hidden;
+        overflow-y: auto;
       }
   }
 }
