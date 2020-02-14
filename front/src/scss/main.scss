@@ -78,3 +78,10 @@ body {
     }
   }
 }
+
+.wwr-chat-list {
+  cursor: pointer;
+  &:hover {
+    background: $gray-200;
+  }
+}

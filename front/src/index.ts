@@ -16,11 +16,21 @@ let clientWebsocket = new WebSocketClientHelper(config.API_URL);
 let isClientLoggedIn: boolean;
 let chatRequestResult: any = null;
 
+let currentChatMessages: ListView<WAChatMessage> = new ListView<WAChatMessage>((message: WAChatMessage) => {
+    let li = document.createElement("li");
+    li.className = "list-group-item";
+    li.innerHTML = `
+        <div class="row">
+            ${message.content}
+        </div>
+        `;
+    return li;
+}, document.querySelector("#wwr-chat-content-list"));
 
 
 let chats: ListView<WAChat> = new ListView<any>((chat: WAChat) => {
     let li = document.createElement("li");
-    li.className = "list-group-item";
+    li.className = "list-group-item wwr-chat-list";
     li.innerHTML = `
         <div class="row">
             <div class="col-3">
@@ -34,6 +44,9 @@ let chats: ListView<WAChat> = new ListView<any>((chat: WAChat) => {
                 </div>
             </div>
         </div>`;
+    li.addEventListener("click", (event: MouseEvent) => {
+        console.log("Downloading...");
+    });
     return li;
 }, document.querySelector("#wwr-chat-ul"));
 
