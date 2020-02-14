@@ -3,7 +3,6 @@ import '@fortawesome/fontawesome-free/css/all.css';
 import "./scss/main.scss";
 // @ts-ignore
 import $ from "jquery"
-
 import config from "./config";
 import WebSocketClientHelper from "./helpers/WebSocketClientHelper";
 import WebsocketStepWait from "./helpers/WebsocketStepWait";
@@ -11,17 +10,16 @@ import WebSocketMessageListener from "./helpers/WebSocketMessageListener";
 import ListView from "./helpers/ListView";
 import WAChat from "./model/WAChat";
 import WAChatMessage from "./model/WAChatMessage";
+import {showMessages, showLoading, showQRCode, updateQRCode} from "./view";
 
 let clientWebsocket = new WebSocketClientHelper(config.API_URL);
-
 let isClientLoggedIn: boolean;
-
 let chatRequestResult: any = null;
+
 
 
 let chats: ListView<WAChat> = new ListView<any>((chat: WAChat) => {
     let li = document.createElement("li");
-    console.log("PUTAIN DE LI DE MERDE !");
     li.className = "list-group-item";
     li.innerHTML = `
         <div class="row">
@@ -42,10 +40,10 @@ let chats: ListView<WAChat> = new ListView<any>((chat: WAChat) => {
 function initializeModelVars() {
     isClientLoggedIn = false;
     chats.clear();
-    // contacts.clear();
 }
 initializeModelVars();
 function whatsAppConnectionLost(){
+    showLoading();
     initializeModelVars();
     connectWhatsAppStep.run();
 }
@@ -83,8 +81,7 @@ clientWebsocket.addMessageListener(new WebSocketMessageListener(
             // On Login
             if (!isClientLoggedIn && messageType === "Conn") {
                 isClientLoggedIn = true;
-                document.querySelector("#view-1").classList.add("d-none");
-                document.querySelector("#view-2").classList.remove("d-none");
+                showMessages();
                 return;
             }
             switch (messageType) {
@@ -136,6 +133,7 @@ clientWebsocket.addMessageListener(new WebSocketMessageListener(
 let stepLoginAPI = new WebsocketStepWait(
         clientWebsocket,
         (webSocket) => {
+            showLoading();
             webSocket.initializeWebsocket();
         }, new WebSocketMessageListener(
             (obj, tag) =>
@@ -186,17 +184,6 @@ let connectWhatsAppStep = new WebsocketStepWait(
 );
 stepLoginAPI.nextStep.nextStep = connectWhatsAppStep;
 
-function viewQRCodeShow(imageData) {
-    let qrCodeContent = document.querySelector("#qrcode-content");
-    (qrCodeContent).innerHTML = "";
-    let image = document.createElement("img");
-    image.setAttribute("src", imageData);
-    qrCodeContent.append(image);
-
-    document.querySelector("#view-0").className = "d-none container";
-    document.querySelector("#view-1").classList.remove("d-none");
-}
-
 connectWhatsAppStep.nextStep = new WebsocketStepWait(
     clientWebsocket,
     (webSocket) => {
@@ -212,9 +199,9 @@ connectWhatsAppStep.nextStep = new WebsocketStepWait(
         (obj, tag) => {
             return new Promise<any>((resolve, reject) => {
                 resolve(obj);
-                viewQRCodeShow(obj.image);
+                updateQRCode(obj.image);
+                showQRCode();
             })
         })
 );
 stepLoginAPI.run();
-
