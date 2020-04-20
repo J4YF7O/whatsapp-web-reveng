@@ -143,7 +143,6 @@ class WhatsAppWebClient:
         eprint("WhatsApp backend Websocket closed.");
 
     def onMessage(self, ws, message):
-
         try:
             messageSplit = message.split(",", 1);
             messageTag = messageSplit[0];
@@ -276,7 +275,7 @@ class WhatsAppWebClient:
     def getConnectionInfo(self, callback):
         callback["func"]({ "type": "connection_info", "data": self.connInfo }, callback);
 
-    def get_chat_history(self, callback, jid, count=10000):
+    def get_chat_history(self, callback, jid, count=100):
         """
 
         :param callback:
